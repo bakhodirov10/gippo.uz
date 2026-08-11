@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gippo_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: gippo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gippo_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgrespassword@postgres:5432/gippo_db?schema=public"
+      PORT: 3000
+      NODE_ENV: production
+      CORS_ORIGIN: "*"
+      JWT_SECRET: "super-secret-jwt-access-key-gippo-2026"
+      JWT_EXPIRATION: "15m"
+      JWT_REFRESH_SECRET: "super-secret-jwt-refresh-key-gippo-2026"
+      JWT_REFRESH_EXPIRATION: "7d"
+      ADMIN_REGISTRATION_SECRET: "gippo-admin-secure-registration-code-2026"
+      PAYMENT_SECRET: "gippo-payment-secret-key"
+      PAYMENT_WEBHOOK_SECRET: "gippo-webhook-signature-secret"
+      AI_API_KEY: "AIzaSy_mock_gemini_api_key_for_backend_env"
+      VIDEO_API_SECRET: "gippo-video-telehealth-secret"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,0 +1,110 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { DoctorProfile } from '@/types';
+import { formatCurrency } from '@/lib/cn';
+import { Star, ShieldCheck, Award, Clock, ArrowRight, Video } from 'lucide-react';
+
+interface DoctorCardProps {
+  doctor: DoctorProfile;
+  onBookClick?: (doctor: DoctorProfile) => void;
+}
+
+export function DoctorCard({ doctor, onBookClick }: DoctorCardProps) {
+  const ratingNum = typeof doctor.averageRating === 'string' ? parseFloat(doctor.averageRating) : doctor.averageRating;
+  const fullName = doctor.user ? `${doctor.user.firstName} ${doctor.user.lastName}` : 'Shifokor';
+  const primarySpecialty = doctor.specialties && doctor.specialties.length > 0 ? doctor.specialties[0].name : 'Kardiolog';
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-xl hover:border-teal-300 transition-all duration-300 flex flex-col justify-between group">
+      <div>
+        {/* Header section with photo and status */}
+        <div className="flex items-start gap-4 mb-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-2xl gradient-teal text-white flex items-center justify-center font-extrabold text-xl shadow-md group-hover:scale-105 transition-transform">
+              {fullName
+                .split(' ')
+                .map((n) => n[0])
+                .join('')}
+            </div>
+            {doctor.isOnline && (
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center animate-pulse" title="Online" />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="font-bold text-slate-900 text-base group-hover:text-teal-700 transition-colors truncate">
+                Dr. {fullName}
+              </h3>
+              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                <ShieldCheck className="w-3 h-3 text-teal-600" />
+                Litsenziyalangan
+              </span>
+            </div>
+
+            <p className="text-xs font-semibold text-teal-600 mt-0.5">{primarySpecialty}</p>
+
+            {/* Rating & Reviews */}
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/60">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-xs font-bold text-amber-900">
+                  {ratingNum > 0 ? ratingNum.toFixed(1) : '5.0'}
+                </span>
+              </div>
+              <span className="text-xs text-slate-400">({doctor.totalReviews || 0} ta sharh)</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Experience & Bio */}
+        <div className="space-y-2 mb-4 pt-3 border-t border-slate-100">
+          <div className="flex items-center gap-4 text-xs text-slate-600">
+            <span className="flex items-center gap-1 font-medium">
+              <Award className="w-3.5 h-3.5 text-teal-600" />
+              Tajriba: <strong className="text-slate-800">{doctor.experienceYears} yil</strong>
+            </span>
+            <span className="flex items-center gap-1 font-medium">
+              <Clock className="w-3.5 h-3.5 text-teal-600" />
+              Online: <strong className="text-emerald-600">Bugun mavjud</strong>
+            </span>
+          </div>
+
+          {doctor.bio && (
+            <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+              {doctor.bio}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Footer & Pricing */}
+      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+        <div>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Konsultatsiya narxi</span>
+          <span className="text-base font-extrabold text-slate-900">
+            {formatCurrency(doctor.consultationFee)}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/doctors/${doctor.id}`}
+            className="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+          >
+            Profil
+          </Link>
+          <button
+            onClick={() => onBookClick ? onBookClick(doctor) : null}
+            className="px-4 py-2 text-xs font-bold text-white gradient-teal rounded-xl shadow-md shadow-teal-500/20 hover:opacity-95 transition-opacity flex items-center gap-1.5"
+          >
+            <Video className="w-3.5 h-3.5" />
+            Bron qilish
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
