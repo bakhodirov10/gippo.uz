@@ -1,0 +1,18 @@
+{
+  "welcome": "Welcome back,",
+  "subtitle": "Patient Portal | Appointments & AI Medical Assistant",
+  "newBooking": "Book New Consultation",
+  "aiAssistantFree": "AI Medical Assistant (Free)",
+  "pendingAppointments": "Upcoming Appointments",
+  "pendingDesc": "Pending & confirmed slots",
+  "completedConsultations": "Completed Consultations",
+  "completedDesc": "Successfully conducted",
+  "aiChatTitle": "AI Medical Chat",
+  "freeText": "Free",
+  "startChat": "Start Conversation →",
+  "upcomingTitle": "Your Upcoming Appointments",
+  "viewAll": "View All →",
+  "noUpcoming": "You have no upcoming appointments scheduled.",
+  "goToDoctors": "Browse Doctors Directory",
+  "enterRoom": "Enter Video Room"
+}

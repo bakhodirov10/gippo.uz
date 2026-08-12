@@ -21,6 +21,6 @@ export const availabilityService = {
   async setDoctorAvailability(
     slots: SetAvailabilitySlot[],
   ): Promise<Availability[]> {
-    return apiClient.put<any, Availability[]>('/availability/me', { slots });
+    return apiClient.put<any, Availability[]>('/availability/me', { availabilities: slots });
   },
 };

@@ -1,0 +1,21 @@
+{
+  "doctors": "Doctors",
+  "specialties": "Specialties",
+  "ai": "Gippo AI",
+  "howItWorks": "How it works",
+  "forDoctors": "For Doctors",
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout",
+  "dashboard": "Patient Dashboard",
+  "doctorPortal": "Doctor Portal",
+  "adminPanel": "Admin Panel",
+  "getStarted": "Get Started",
+  "myAppointments": "My Appointments",
+  "paymentHistory": "Payment History",
+  "signedInAs": "Signed in as:",
+  "doctorLoginLink": "Doctor Sign In",
+  "patientRegister": "Patient Registration",
+  "doctorPortalLink": "Portal for Doctors",
+  "settings": "Settings"
+}

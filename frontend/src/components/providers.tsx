@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { useLanguageStore } from '@/stores/useLanguageStore';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -19,10 +21,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
+  const initTheme = useThemeStore((state) => state.initTheme);
+  const initLanguage = useLanguageStore((state) => state.initLanguage);
 
   useEffect(() => {
     hydrateAuth();
-  }, [hydrateAuth]);
+    initTheme();
+    initLanguage();
+  }, [hydrateAuth, initTheme, initLanguage]);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,0 +1,20 @@
+{
+  "title": "Contact Us",
+  "subtitle": "Reach out with questions or feedback. Our support team is here to help 24/7.",
+  "addressLabel": "Address",
+  "addressValue": "Tashkent city, Yunusabad district, Amir Temur Ave 108",
+  "address": "Tashkent city, Yunusabad district, Amir Temur Ave 108",
+  "phoneLabel": "Phone",
+  "messageLabel": "Message",
+  "messagePlaceholder": "Type your question or message here...",
+  "sendBtn": "Send Message",
+  "thankYou": "Thank you!",
+  "sentSuccess": "Your message has been sent successfully. We will get back to you shortly.",
+  "infoTitle": "Contact Information",
+  "sentTitle": "Message Sent!",
+  "sentDesc": "We received your message and will respond promptly.",
+  "nameLabel": "Name",
+  "namePlaceholder": "Enter your name",
+  "emailLabel": "Email",
+  "emailPlaceholder": "email@example.com"
+}

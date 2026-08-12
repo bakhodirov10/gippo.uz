@@ -1,0 +1,20 @@
+{
+  "desc": "Leading health-tech marketplace in Uzbekistan. Online consultations with licensed medical professionals and instant free AI assistant.",
+  "emergencyTitle": "Emergency (103):",
+  "emergencyText": "In medical emergencies call 103 immediately. AI Assistant provides informational guidance only and does not diagnose.",
+  "platformTitle": "Platform",
+  "doctorsCatalog": "Doctors Directory",
+  "medicalSpecialties": "Medical Specialties",
+  "aiAssistant": "AI Medical Assistant",
+  "doctorRegistration": "Doctor Registration",
+  "securityTitle": "Security & Ledger",
+  "sec1": "SSL & SHA-256 encrypted auth",
+  "sec2": "95% / 5% Transparent ledger split",
+  "sec3": "Strictly verified licensed doctors",
+  "contactTitle": "Contact Us",
+  "address": "108 Amir Temur Ave, Yunusabad, Tashkent",
+  "rights": "© 2026 Gippo.uz Platform. All rights reserved.",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfUse": "Terms of Service",
+  "adminPortal": "Admin Console"
+}

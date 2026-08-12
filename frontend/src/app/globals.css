@@ -1,36 +1,119 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 173 80% 40%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 199 89% 48%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 173 70% 95%;
-    --accent-foreground: 173 80% 25%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 173 80% 40%;
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #0d9488;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #475569;
+    --accent: #ccfbf1;
+    --accent-foreground: #0f766e;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #0d9488;
     --radius: 0.75rem;
   }
 
+  .dark {
+    --background: #030712;
+    --foreground: #f8fafc;
+    --card: #0f172a;
+    --card-foreground: #f8fafc;
+    --popover: #0f172a;
+    --popover-foreground: #f8fafc;
+    --primary: #0d9488;
+    --primary-foreground: #ffffff;
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    --muted: #1e293b;
+    --muted-foreground: #cbd5e1;
+    --accent: #134e4a;
+    --accent-foreground: #2dd4bf;
+    --destructive: #991b1b;
+    --destructive-foreground: #ffffff;
+    --border: #1e293b;
+    --input: #1e293b;
+    --ring: #0d9488;
+  }
+
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
       Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.dark body {
+  background-color: #030712;
+  color: #f3f4f6;
+}
+
+.dark .gradient-hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(13, 148, 136, 0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(2, 132, 199, 0.15) 0%, transparent 60%),
+    #030712;
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+}
+
+.dark ::-webkit-scrollbar-track { background: #0f172a; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none !important;
+  }
+  .animate-float, .animate-float-delayed, .animate-pulse-ring, .animate-fade-up {
+    animation: none !important;
   }
 }
 
@@ -45,8 +128,8 @@
 
 .gradient-hero {
   background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(13, 148, 136, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(2, 132, 199, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(13, 148, 136, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(2, 132, 199, 0.08) 0%, transparent 60%),
     #f8fafc;
 }
 
@@ -59,7 +142,14 @@
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%);
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .text-gradient {
+  background: linear-gradient(135deg, #2dd4bf 0%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -120,20 +210,20 @@
 }
 
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(32px); }
+  from { opacity: 0; transform: translateX(100%); }
   to { opacity: 1; transform: translateX(0); }
 }
 
 .animate-float { animation: float 4s ease-in-out infinite; }
 .animate-float-delayed { animation: float 4s ease-in-out 2s infinite; }
 .animate-pulse-ring { animation: pulse-ring 2s ease-in-out infinite; }
-.animate-fade-up { animation: fade-up 0.6s ease-out both; }
+.animate-fade-up { animation: fade-up 0.3s ease-out both; }
 .animate-fade-up-delay-1 { animation: fade-up 0.6s ease-out 0.1s both; }
 .animate-fade-up-delay-2 { animation: fade-up 0.6s ease-out 0.2s both; }
 .animate-fade-up-delay-3 { animation: fade-up 0.6s ease-out 0.3s both; }
 .animate-fade-up-delay-4 { animation: fade-up 0.6s ease-out 0.4s both; }
-.animate-scale-in { animation: scale-in 0.5s ease-out both; }
-.animate-slide-right { animation: slide-in-right 0.6s ease-out both; }
+.animate-scale-in { animation: scale-in 0.3s ease-out both; }
+.animate-slide-right { animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 .typing-dot {
   width: 6px;

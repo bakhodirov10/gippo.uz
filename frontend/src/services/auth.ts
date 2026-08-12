@@ -1,18 +1,25 @@
 import { apiClient } from '@/lib/axios';
 import { ApiResponse, User } from '@/types';
 
-// --- Backend response shapes ---
-// POST /auth/register   → { user, tokens: { accessToken, refreshToken } }
-// POST /auth/login      → { user, tokens: { accessToken, refreshToken } }
-// POST /auth/refresh    → { accessToken, refreshToken }     (flat)
-// Axios interceptor already unwraps { success, data } → returns `data` directly.
-
 export interface RegisterPatientPayload {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
   phone?: string;
+}
+
+export interface RegisterDoctorPayload {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  licenseNumber: string;
+  experienceYears: number;
+  consultationFee: number;
+  specialtyIds?: string[];
+  bio?: string;
 }
 
 export interface RegisterAdminPayload {
@@ -34,7 +41,6 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
-/** Raw shape that backend actually returns for register/login */
 interface BackendAuthData {
   user: User;
   tokens: {
@@ -43,7 +49,6 @@ interface BackendAuthData {
   };
 }
 
-/** Flatten backend { user, tokens } into the AuthResponse shape the app uses */
 function flattenAuthData(data: BackendAuthData): AuthResponse {
   return {
     user: data.user,
@@ -54,18 +59,29 @@ function flattenAuthData(data: BackendAuthData): AuthResponse {
 
 export const authService = {
   async registerPatient(payload: RegisterPatientPayload): Promise<AuthResponse> {
-    // Interceptor unwraps { success, data } → res is already `data` ({ user, tokens })
     const res = await apiClient.post<any, BackendAuthData>('/auth/register', payload);
+    return flattenAuthData(res);
+  },
+
+  async registerDoctor(payload: RegisterDoctorPayload): Promise<AuthResponse> {
+    const res = await apiClient.post<any, BackendAuthData>('/auth/register-doctor', payload);
     return flattenAuthData(res);
   },
 
   async registerAdmin(payload: RegisterAdminPayload): Promise<AuthResponse> {
     const { inviteSecret, ...body } = payload;
-    const res = await apiClient.post<any, BackendAuthData>('/auth/register-admin', body, {
-      headers: {
-        'x-admin-invite-secret': inviteSecret,
+    const res = await apiClient.post<any, BackendAuthData>(
+      '/auth/register-admin',
+      {
+        ...body,
+        adminInviteSecret: inviteSecret,
       },
-    });
+      {
+        headers: {
+          'x-admin-invite-secret': inviteSecret,
+        },
+      },
+    );
     return flattenAuthData(res);
   },
 
@@ -75,7 +91,6 @@ export const authService = {
   },
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
-    // /auth/refresh returns flat { accessToken, refreshToken } (no tokens wrapper)
     const res = await apiClient.post<any, { accessToken: string; refreshToken: string }>(
       '/auth/refresh',
       { refreshToken },
@@ -85,5 +100,18 @@ export const authService = {
 
   async logout(refreshToken?: string): Promise<void> {
     await apiClient.post('/auth/logout', { refreshToken });
+  },
+
+  async forgotPassword(email: string): Promise<void> {
+    await apiClient.post('/auth/forgot-password', { email });
+  },
+
+  async resetPassword(payload: { token: string; newPassword: string }): Promise<void> {
+    await apiClient.post('/auth/reset-password', payload);
+  },
+
+  async updateProfile(payload: { firstName: string; lastName: string; phone?: string }): Promise<User> {
+    const res = await apiClient.put<any, User>('/users/me', payload);
+    return res;
   },
 };

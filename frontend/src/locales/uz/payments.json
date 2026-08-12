@@ -1,0 +1,12 @@
+{
+  "title": "To'lovlar Tarixi",
+  "subtitle": "Barcha amalga oshirilgan va kutilayotgan to'lov tranzaksiyalari",
+  "transactionsList": "Tranzaksiyalar Ro'yxati",
+  "splitNotice": "Gippo platformasi daromadning 5% qismini oladi, shifokorga 95% to'lanadi.",
+  "ledgerNotice": "Barcha hisob-kitoblar xavfsiz backend ledgertizimida saqlanadi.",
+  "noTransactions": "Tranzaksiyalar Topilmadi",
+  "noTransactionsDesc": "Sizda hali hech qanday to'lov tarixi mavjud emas.",
+  "transactionId": "Tranzaksiya ID",
+  "provider": "To'lov Tizimi",
+  "amount": "Summa"
+}

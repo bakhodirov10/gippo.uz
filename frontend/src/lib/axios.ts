@@ -20,11 +20,13 @@ export const apiClient = axios.create({
 // ─── Request interceptor ──────────────────────────────────────────────────────
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    let hasAccessToken = false;
     // Attach JWT access token if present
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('gippo_access_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        hasAccessToken = true;
       }
     }
 
@@ -32,11 +34,12 @@ apiClient.interceptors.request.use(
     if (process.env.NODE_ENV !== 'production') {
       const base = (config.baseURL ?? '').replace(/\/$/, '');
       const path = config.url ?? '';
-      console.log('[API Request]', {
+      console.log('[API REQUEST]', {
         method: (config.method ?? 'GET').toUpperCase(),
         baseURL: config.baseURL,
         url: path,
         finalURL: `${base}${path}`,
+        hasAccessToken,
       });
     }
 
@@ -110,15 +113,15 @@ apiClient.interceptors.response.use(
     if (process.env.NODE_ENV !== 'production') {
       const base = (error.config?.baseURL ?? '').replace(/\/$/, '');
       const path = error.config?.url ?? '';
-      console.error('[API Error]', {
+      console.error('[API ERROR]', {
         name: error.name,
         message: error.message,
         method: (error.config?.method ?? '').toUpperCase(),
         baseURL: error.config?.baseURL,
         url: path,
         finalURL: `${base}${path}`,
-        httpStatus: error.response?.status,
-        httpStatusText: error.response?.statusText,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
         responseData: error.response?.data ?? '(no response — network error?)',
         isAxiosError: error.isAxiosError,
       });

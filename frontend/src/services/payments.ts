@@ -6,8 +6,6 @@ export interface CreatePaymentPayload {
   providerName?: 'CLICK' | 'PAYME' | 'STRIPE' | 'MOCK';
 }
 
-// NOTE: Axios interceptor unwraps { success, data: T } → returns T directly.
-
 export const paymentsService = {
   async createPayment(
     payload: CreatePaymentPayload,
@@ -24,5 +22,13 @@ export const paymentsService = {
       status: 'PAID',
       provider: 'MOCK',
     });
+  },
+
+  async getUserPayments(): Promise<Payment[]> {
+    try {
+      return await apiClient.get<any, Payment[]>('/payments/my');
+    } catch {
+      return [];
+    }
   },
 };

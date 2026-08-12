@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { Stethoscope, Mail, Lock, User, Phone, AlertCircle, Loader2 } from 'lucide-react';
+import { useLanguageStore } from '@/stores/useLanguageStore';
+import { Stethoscope, Mail, Lock, Phone, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function PatientRegisterPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const { t } = useLanguageStore();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -30,7 +32,7 @@ export default function PatientRegisterPage() {
       setAuth(res.user, res.accessToken, res.refreshToken);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Ro‘yxatdan o‘tishda xatolik yuz berdi (Email allaqachon mavjud bo’lishi mumkin)');
+      setError(err.message || 'Registration failed');
     } finally {
       setIsLoading(false);
     }
@@ -38,17 +40,16 @@ export default function PatientRegisterPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-8 shadow-xl max-w-md w-full space-y-6">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-8 shadow-xl max-w-md w-full space-y-6 transition-colors">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl gradient-teal text-white flex items-center justify-center mx-auto shadow-md">
             <Stethoscope className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900">Bemor Ro'yxatdan O'tishi</h1>
-          <p className="text-xs text-slate-500">Gippo.uz platformasida bemor akkountini yarating</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t.auth.patientRegisterTitle}</h1>
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+          <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -57,46 +58,46 @@ export default function PatientRegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Ism</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.firstName}</label>
               <input
                 type="text"
                 required
                 placeholder="Jasur"
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Familiya</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.lastName}</label>
               <input
                 type="text"
                 required
                 placeholder="Aliyev"
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Manzil</label>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.email}</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
               <input
                 type="email"
                 required
-                placeholder="bemor@example.com"
+                placeholder="patient@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Telefon Raqam</label>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.phone}</label>
             <div className="relative">
               <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
               <input
@@ -104,13 +105,13 @@ export default function PatientRegisterPage() {
                 placeholder="+998901234567"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Parol (Kamida 6 belgi)</label>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.password}</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
               <input
@@ -120,7 +121,7 @@ export default function PatientRegisterPage() {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
               />
             </div>
           </div>
@@ -130,14 +131,14 @@ export default function PatientRegisterPage() {
             disabled={isLoading}
             className="w-full py-3.5 rounded-xl font-bold text-white gradient-teal shadow-lg shadow-teal-500/25 hover:opacity-95 text-xs flex items-center justify-center gap-2"
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Ro‘yxatdan o‘tish'}
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : t.auth.registerBtn}
           </button>
         </form>
 
-        <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-500">
-          Akkountingiz bormi?{' '}
-          <Link href="/login" className="font-bold text-teal-600 hover:underline">
-            Kirish
+        <div className="text-center pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
+          {t.auth.alreadyAccount}{' '}
+          <Link href="/login" className="font-bold text-teal-600 dark:text-teal-400 hover:underline">
+            {t.auth.loginBtn}
           </Link>
         </div>
       </div>

@@ -4,10 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { aiService, ChatResponse } from '@/services/ai';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useLanguageStore } from '@/stores/useLanguageStore';
 
-// Endpoint: POST http://localhost:3000/api/v1/ai/chat
-// Auth:     @Public() — no token required (optional userId from JWT if present)
 import {
   Bot,
   Send,
@@ -15,10 +13,9 @@ import {
   PhoneCall,
   Trash2,
   User,
-  Loader2,
   Info,
-  AlertCircle,
 } from 'lucide-react';
+import { SkeletonAIMessage } from '@/components/ui/skeletons';
 
 interface LocalMessage {
   id: string;
@@ -30,14 +27,15 @@ interface LocalMessage {
 }
 
 export default function AIAssistantPage() {
+  const { t } = useLanguageStore();
+
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<LocalMessage[]>([
     {
       id: 'welcome-1',
       sender: 'ASSISTANT',
-      content:
-        "Assalomu alaykum! Men Gippo.uz AI Tibbiy Assistentiman. Qanday tibbiy alomatlar yoki savollaringiz bor? Qulay tarzda yozishingiz mumkin.",
-      disclaimer: "Disclaimer: Gippo AI is an informational tool and does NOT replace professional medical advice, diagnosis, or treatment. Always consult a verified doctor for health concerns. In case of emergency, call 103 immediately.",
+      content: t.ai.welcomeMessage,
+      disclaimer: t.ai.disclaimer,
     },
   ]);
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>(undefined);
@@ -62,7 +60,7 @@ export default function AIAssistantPage() {
           id: data.messageId || String(Date.now()),
           sender: 'ASSISTANT',
           content: data.reply,
-          disclaimer: data.disclaimer || "Disclaimer: Gippo AI is an informational tool and does NOT replace professional medical advice, diagnosis, or treatment.",
+          disclaimer: data.disclaimer || t.ai.disclaimer,
           isEmergency: data.isEmergency,
           emergencyNotice: data.emergencyNotice,
         },
@@ -70,39 +68,21 @@ export default function AIAssistantPage() {
 
       if (data.isEmergency) {
         setEmergencyAlert(
-          data.emergencyNotice || "Favqulodda alomatlar aniqlandi! Zudlik bilan 103 Tez Yordam xizmatiga murojaat qiling!"
+          data.emergencyNotice || t.ai.emergencyAlert
         );
       }
     },
     onError: (err: any) => {
-      // Structured dev logging — AxiosError carries .response, plain Error does not
-      if (process.env.NODE_ENV !== 'production') {
-        const axiosErr = err as AxiosError<any>;
-        console.error('[AI Chat Request Failed]', {
-          name: axiosErr.name,
-          message: axiosErr.message,
-          httpStatus: axiosErr.response?.status,
-          httpStatusText: axiosErr.response?.statusText,
-          requestURL: axiosErr.config
-            ? `${axiosErr.config.baseURL ?? ''}${axiosErr.config.url ?? ''}`
-            : 'unknown',
-          requestMethod: axiosErr.config?.method?.toUpperCase(),
-          responseData: axiosErr.response?.data ?? '(no response body — network error?)',
-          isAxiosError: axiosErr.isAxiosError,
-        });
-      }
-
       const axiosErr = err as AxiosError<any>;
       const httpStatus = axiosErr.response?.status;
       const backendMsg: string =
         axiosErr.response?.data?.message ||
         axiosErr.message ||
-        'Nomalum server xatosi';
+        t.common.error;
 
-      // User-friendly message — never exposes tokens or secrets
       const uiMessage = httpStatus
-        ? `Server xatosi (${httpStatus}): ${backendMsg}`
-        : `Tarmoq xatosi: ${backendMsg}. Backend ishlamoqdami? (http://localhost:3000)`;
+        ? `Server error (${httpStatus}): ${backendMsg}`
+        : `Network error: ${backendMsg}.`;
 
       setMessages((prev) => [
         ...prev,
@@ -110,7 +90,7 @@ export default function AIAssistantPage() {
           id: String(Date.now()),
           sender: 'ASSISTANT',
           content: uiMessage,
-          disclaimer: 'Medical information, not a diagnosis',
+          disclaimer: t.ai.disclaimer,
         },
       ]);
     },
@@ -140,8 +120,8 @@ export default function AIAssistantPage() {
       {
         id: 'welcome-1',
         sender: 'ASSISTANT',
-        content: "Suhbat tozalandi. Qanday tibbiy savolingiz bor?",
-        disclaimer: "Disclaimer: Gippo AI is an informational tool and does NOT replace professional medical advice.",
+        content: t.ai.chatCleared,
+        disclaimer: t.ai.disclaimer,
       },
     ]);
     setActiveConversationId(undefined);
@@ -149,39 +129,39 @@ export default function AIAssistantPage() {
   };
 
   const suggestedQuestions = [
-    "Bosh og'rig'i va charchoq sabablari nimada?",
-    "Shamollashning dastlabki alomatlarida nima qilish kerak?",
-    "Sog'lom ovqatlanish rejasi haqida ma'lumot bering",
-    "Qon bosimi oshganda birinchi yordam",
+    t.ai.suggested1,
+    t.ai.suggested2,
+    t.ai.suggested3,
+    t.ai.suggested4,
   ];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header & Safety Warning */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl gradient-teal text-white flex items-center justify-center font-bold shadow-md">
             <Bot className="w-7 h-7 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-black text-slate-900">AI Medical Assistant</h1>
-              <span className="bg-teal-100 text-teal-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
-                100% BEPUL
+              <h1 className="text-xl font-black text-slate-900 dark:text-white">{t.ai.title}</h1>
+              <span className="bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
+                {t.ai.freeBadge}
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Xavfsiz, mas'uliyatli va tibbiy disclaimeli AI maslahatchisi
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {t.ai.subtitle}
             </p>
           </div>
         </div>
 
         <button
           onClick={handleClearChat}
-          className="px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-xs font-bold transition-colors flex items-center gap-1.5"
+          className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-200 text-xs font-bold transition-colors flex items-center gap-1.5"
         >
           <Trash2 className="w-4 h-4" />
-          Suhbatni Tozalash
+          {t.ai.clearChat}
         </button>
       </div>
 
@@ -191,24 +171,24 @@ export default function AIAssistantPage() {
           <div className="flex items-center gap-3">
             <ShieldAlert className="w-7 h-7 shrink-0" />
             <div>
-              <strong className="block font-bold text-sm">ZUDLIK BILAN TEZ YORDAM (103) GA QO'NG'IROQ QILING!</strong>
+              <strong className="block font-bold text-sm">{t.ai.emergencyAlert}</strong>
               <p className="text-xs text-rose-100 mt-0.5">{emergencyAlert}</p>
             </div>
           </div>
           <a
             href="tel:103"
-            className="px-4 py-2 bg-white text-rose-700 font-extrabold text-xs rounded-xl shadow shrink-0 hover:bg-rose-50"
+            className="px-4 py-2 bg-white text-rose-700 font-extrabold text-xs rounded-xl shadow shrink-0 hover:bg-rose-50 flex items-center gap-1"
           >
-            <PhoneCall className="w-4 h-4 inline mr-1" />
-            103 Call
+            <PhoneCall className="w-4 h-4" />
+            {t.ai.call103}
           </a>
         </div>
       )}
 
       {/* Main Chat Box Container */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-lg overflow-hidden flex flex-col h-[600px]">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg overflow-hidden flex flex-col h-[600px] transition-colors">
         {/* Messages Scroll Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/50 dark:bg-slate-950/50">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -220,19 +200,19 @@ export default function AIAssistantPage() {
                 className={`max-w-[85%] sm:max-w-[75%] rounded-3xl p-4 text-xs leading-relaxed shadow-sm ${
                   msg.sender === 'USER'
                     ? 'bg-teal-600 text-white rounded-tr-none'
-                    : 'bg-white text-slate-800 border border-slate-200/80 rounded-tl-none space-y-2'
+                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700 rounded-tl-none space-y-2'
                 }`}
               >
                 <div className="flex items-center gap-1.5 font-bold mb-1 opacity-80">
                   {msg.sender === 'USER' ? (
                     <>
-                      <span>Siz</span>
+                      <span>{t.ai.you}</span>
                       <User className="w-3.5 h-3.5" />
                     </>
                   ) : (
                     <>
-                      <Bot className="w-3.5 h-3.5 text-teal-600" />
-                      <span className="text-teal-700">AI Medical Assistant</span>
+                      <Bot className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                      <span className="text-teal-700 dark:text-teal-400">Gippo AI</span>
                     </>
                   )}
                 </div>
@@ -241,7 +221,7 @@ export default function AIAssistantPage() {
 
                 {/* Medical Disclaimer Banner */}
                 {msg.sender === 'ASSISTANT' && msg.disclaimer && (
-                  <div className="mt-2 pt-2 border-t border-slate-100 flex items-start gap-1.5 text-[10px] text-amber-700 bg-amber-50/80 p-2 rounded-xl">
+                  <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-700 flex items-start gap-1.5 text-[10px] text-amber-700 dark:text-amber-300 bg-amber-50/80 dark:bg-amber-950/60 p-2 rounded-xl">
                     <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                     <span>{msg.disclaimer}</span>
                   </div>
@@ -251,9 +231,8 @@ export default function AIAssistantPage() {
           ))}
 
           {chatMutation.isPending && (
-            <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 bg-white p-3.5 rounded-2xl border border-slate-200 w-fit">
-              <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-              <span>AI tahlil qilmoqda va javob tayyorlamoqda...</span>
+            <div className="space-y-2">
+              <SkeletonAIMessage from="ai" />
             </div>
           )}
 
@@ -262,12 +241,12 @@ export default function AIAssistantPage() {
 
         {/* Suggested Prompts Pill */}
         {messages.length <= 2 && (
-          <div className="p-3 bg-white border-t border-slate-100 flex gap-2 overflow-x-auto">
+          <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex gap-2 overflow-x-auto">
             {suggestedQuestions.map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(q)}
-                className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-teal-50 hover:text-teal-700 text-[11px] font-semibold text-slate-700 shrink-0 transition-colors"
+                className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-teal-950/60 hover:text-teal-700 dark:hover:text-teal-300 text-[11px] font-semibold text-slate-700 dark:text-slate-300 shrink-0 transition-colors"
               >
                 💡 {q}
               </button>
@@ -276,21 +255,21 @@ export default function AIAssistantPage() {
         )}
 
         {/* Input Bar */}
-        <div className="p-4 bg-white border-t border-slate-200 flex items-center gap-3">
+        <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center gap-3">
           <input
             type="text"
-            placeholder="Tibbiy alomatlar yoki savolingizni yozing..."
+            placeholder={t.ai.placeholder}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
           <button
             onClick={() => handleSend()}
             disabled={!inputMessage.trim() || chatMutation.isPending}
             className="px-5 py-3 rounded-2xl gradient-teal text-white font-bold text-xs shadow-md shadow-teal-500/20 disabled:opacity-50 hover:opacity-95 transition-all flex items-center gap-1.5"
           >
-            <span>Yuborish</span>
+            <span>{t.ai.send}</span>
             <Send className="w-4 h-4" />
           </button>
         </div>
