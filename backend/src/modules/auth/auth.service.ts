@@ -34,6 +34,16 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
+    if (dto.phone && dto.phone.trim()) {
+      const existingPhone = await this.prisma.user.findFirst({
+        where: { phone: dto.phone.trim() },
+      });
+
+      if (existingPhone) {
+        throw new ConflictException("Bu telefon raqami allaqachon ro'yxatdan o'tgan");
+      }
+    }
+
     const passwordHash = await PasswordUtil.hashPassword(dto.password);
 
     const user = await this.prisma.user.create({

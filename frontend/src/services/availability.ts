@@ -21,6 +21,13 @@ export const availabilityService = {
   async setDoctorAvailability(
     slots: SetAvailabilitySlot[],
   ): Promise<Availability[]> {
-    return apiClient.put<any, Availability[]>('/availability/me', { availabilities: slots });
+    const formattedSlots = slots.map((s) => ({
+      dayOfWeek: s.dayOfWeek,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      slotDurationMinutes: s.slotDurationMinutes || 30,
+      isAvailable: s.isAvailable !== undefined ? s.isAvailable : true,
+    }));
+    return apiClient.put<any, Availability[]>('/availability/me', { availabilities: formattedSlots });
   },
 };

@@ -52,7 +52,7 @@ function AdminDashboardContent() {
     mutationFn: (payload: { doctorId: string; status: DoctorStatus; rejectionReason?: string; notes?: string }) =>
       doctorsService.reviewDoctorApplication(payload.doctorId, {
         status: payload.status,
-        rejectionReason: payload.rejectionReason,
+        reason: payload.rejectionReason,
         notes: payload.notes,
       }),
     onSuccess: () => {

@@ -7,30 +7,43 @@ export interface RegisterDoctorPayload {
   firstName: string;
   lastName: string;
   phone?: string;
-  bio?: string;
+  bio: string;
   experienceYears: number;
-  education?: string;
+  education: string;
   licenseNumber: string;
   consultationFee: number;
   specialtyIds: string[];
-  documents?: {
-    documentType: string;
-    fileUrl: string;
-    originalName: string;
-  }[];
+}
+
+export interface RegisterDoctorResponse {
+  message: string;
+  doctorProfileId: string;
+  status: DoctorStatus;
 }
 
 export interface ReviewDoctorPayload {
   status: DoctorStatus;
-  rejectionReason?: string;
+  reason?: string;
   notes?: string;
 }
 
 // NOTE: Axios interceptor unwraps { success, data: T } → returns T directly.
 
 export const doctorsService = {
-  async registerDoctor(payload: RegisterDoctorPayload): Promise<DoctorProfile> {
-    return apiClient.post<any, DoctorProfile>('/doctors/register', payload);
+  async registerDoctor(payload: RegisterDoctorPayload): Promise<RegisterDoctorResponse> {
+    return apiClient.post<any, RegisterDoctorResponse>('/doctors/register', {
+      email: payload.email.trim(),
+      password: payload.password,
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim(),
+      phone: payload.phone?.trim() || undefined,
+      bio: payload.bio.trim(),
+      experienceYears: Number(payload.experienceYears),
+      education: payload.education.trim(),
+      licenseNumber: payload.licenseNumber.trim(),
+      consultationFee: Number(payload.consultationFee),
+      specialtyIds: payload.specialtyIds,
+    });
   },
 
   async getPublicDoctors(params?: {

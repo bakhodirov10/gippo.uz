@@ -27,6 +27,16 @@ export class DoctorsService {
       throw new ConflictException('User with this email already exists');
     }
 
+    if (dto.phone && dto.phone.trim()) {
+      const existingPhone = await this.prisma.user.findFirst({
+        where: { phone: dto.phone.trim() },
+      });
+
+      if (existingPhone) {
+        throw new ConflictException("Bu telefon raqami allaqachon ro'yxatdan o'tgan");
+      }
+    }
+
     const existingLicense = await this.prisma.doctorProfile.findUnique({
       where: { licenseNumber: dto.licenseNumber },
     });

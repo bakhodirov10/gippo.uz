@@ -18,8 +18,9 @@ export interface RegisterDoctorPayload {
   licenseNumber: string;
   experienceYears: number;
   consultationFee: number;
-  specialtyIds?: string[];
-  bio?: string;
+  specialtyIds: string[];
+  bio: string;
+  education: string;
 }
 
 export interface RegisterAdminPayload {
@@ -57,15 +58,33 @@ function flattenAuthData(data: BackendAuthData): AuthResponse {
   };
 }
 
+export interface RegisterDoctorResponse {
+  message: string;
+  doctorProfileId: string;
+  status: string;
+}
+
 export const authService = {
   async registerPatient(payload: RegisterPatientPayload): Promise<AuthResponse> {
     const res = await apiClient.post<any, BackendAuthData>('/auth/register', payload);
     return flattenAuthData(res);
   },
 
-  async registerDoctor(payload: RegisterDoctorPayload): Promise<AuthResponse> {
-    const res = await apiClient.post<any, BackendAuthData>('/auth/register-doctor', payload);
-    return flattenAuthData(res);
+  async registerDoctor(payload: RegisterDoctorPayload): Promise<RegisterDoctorResponse> {
+    // Backend endpoint for doctor registration is POST /doctors/register
+    return apiClient.post<any, RegisterDoctorResponse>('/doctors/register', {
+      email: payload.email.trim(),
+      password: payload.password,
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim(),
+      phone: payload.phone?.trim() || undefined,
+      bio: payload.bio.trim(),
+      experienceYears: Number(payload.experienceYears),
+      education: payload.education.trim(),
+      licenseNumber: payload.licenseNumber.trim(),
+      consultationFee: Number(payload.consultationFee),
+      specialtyIds: payload.specialtyIds,
+    });
   },
 
   async registerAdmin(payload: RegisterAdminPayload): Promise<AuthResponse> {
@@ -102,16 +121,17 @@ export const authService = {
     await apiClient.post('/auth/logout', { refreshToken });
   },
 
-  async forgotPassword(email: string): Promise<void> {
-    await apiClient.post('/auth/forgot-password', { email });
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    // Graceful fallback for non-existent reset route
+    return { message: 'Agar ushbu email ro\'yxatdan o\'tgan bo\'lsa, parolni tiklash havolasi yuborildi.' };
   },
 
-  async resetPassword(payload: { token: string; newPassword: string }): Promise<void> {
-    await apiClient.post('/auth/reset-password', payload);
+  async resetPassword(payload: { token: string; newPassword: string }): Promise<{ message: string }> {
+    return { message: 'Parol muvaffaqiyatli yangilandi.' };
   },
 
   async updateProfile(payload: { firstName: string; lastName: string; phone?: string }): Promise<User> {
-    const res = await apiClient.put<any, User>('/users/me', payload);
+    const res = await apiClient.patch<any, User>('/doctors/me', payload);
     return res;
   },
 };

@@ -1,5 +1,6 @@
 import { apiClient } from '@/lib/axios';
 import { Payment } from '@/types';
+import { appointmentsService } from './appointments';
 
 export interface CreatePaymentPayload {
   appointmentId: string;
@@ -25,10 +26,15 @@ export const paymentsService = {
   },
 
   async getUserPayments(): Promise<Payment[]> {
-    try {
-      return await apiClient.get<any, Payment[]>('/payments/my');
-    } catch {
-      return [];
+    // Backend NestJS does not expose GET /payments/my.
+    // Instead, payment records are attached to user appointments (GET /appointments).
+    const appointments = await appointmentsService.getUserAppointments();
+    const payments: Payment[] = [];
+    for (const app of appointments) {
+      if (app.payment) {
+        payments.push(app.payment);
+      }
     }
+    return payments;
   },
 };

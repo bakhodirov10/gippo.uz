@@ -14,5 +14,10 @@
   "suggested1": "Bosh og'rig'i va charchoq sabablari nimada?",
   "suggested2": "Shamollashning dastlabki alomatlarida nima qilish kerak?",
   "suggested3": "Sog'lom ovqatlanish rejasi haqida ma'lumot bering",
-  "suggested4": "Qon bosimi oshganda birinchi yordam"
+  "suggested4": "Qon bosimi oshganda birinchi yordam",
+  "newChat": "Yangi muloqot",
+  "historyTitle": "Muloqotlar tarixi",
+  "noHistory": "Saqlangan suhbatlar yo'q",
+  "guestBanner": "Tizimga kirish orqali AI suhbatlaringiz tarixini saqlashingiz mumkin.",
+  "loginToSave": "Kirish"
 }

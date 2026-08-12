@@ -14,5 +14,10 @@
   "suggested1": "What are common causes of headache and fatigue?",
   "suggested2": "What should I do at the first signs of a cold?",
   "suggested3": "Provide tips for a balanced healthy diet",
-  "suggested4": "First aid steps for elevated blood pressure"
+  "suggested4": "First aid steps for elevated blood pressure",
+  "newChat": "New Conversation",
+  "historyTitle": "Chat History",
+  "noHistory": "No saved conversations",
+  "guestBanner": "Log in to save your AI chat history permanently.",
+  "loginToSave": "Log in"
 }
