@@ -8,20 +8,38 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // Security Middlewares
-  app.use(helmet());
+  // Security Middlewares - configure helmet to allow cross-origin requests & swagger assets
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
-  const allowedOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
-    : [
-        'http://localhost:3001',
-        'http://localhost:3000',
-        'http://127.0.0.1:3001',
-        'http://127.0.0.1:3000',
-      ];
+  const allowedOrigins = [
+    'http://localhost:3001',
+    'http://localhost:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3000',
+  ];
+
+  if (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN !== '*') {
+    process.env.CORS_ORIGIN.split(',').forEach((origin) => {
+      const trimmed = origin.trim();
+      if (trimmed && !allowedOrigins.includes(trimmed)) {
+        allowedOrigins.push(trimmed);
+      }
+    });
+  }
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (requestOrigin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, postman, server-to-server)
+      if (!requestOrigin || allowedOrigins.includes(requestOrigin) || process.env.CORS_ORIGIN === '*') {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With,x-admin-invite-secret',
     credentials: true,
@@ -65,7 +83,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1/docs', app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   logger.log(`🚀 Gippo.uz Backend running on port ${port}`);
   logger.log(`📚 Swagger documentation available at http://localhost:${port}/api/v1/docs`);

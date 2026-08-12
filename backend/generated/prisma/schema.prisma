@@ -1,0 +1,390 @@
+// Prisma Schema for Gippo.uz Production-Ready Health-Tech Platform
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum DoctorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum AppointmentPaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum ConsultationStatus {
+  SCHEDULED
+  IN_PROGRESS
+  ENDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum TransactionType {
+  CHARGE
+  DISBURSEMENT
+  REFUND
+}
+
+enum TransactionStatus {
+  SUCCESS
+  FAILED
+}
+
+enum LedgerEntryType {
+  CREDIT_EARNING
+  DEBIT_WITHDRAWAL
+  HOLD_PENDING
+  RELEASE_PENDING
+}
+
+enum AISender {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum NotificationType {
+  APPOINTMENT
+  PAYMENT
+  SYSTEM
+  APPLICATION
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String
+  role            Role     @default(PATIENT)
+  firstName       String
+  lastName        String
+  phone           String?  @unique
+  isEmailVerified Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  refreshTokens       RefreshToken[]
+  doctorProfile       DoctorProfile?
+  patientAppointments Appointment[]    @relation("PatientAppointments")
+  reviewsWritten      Review[]         @relation("PatientReviews")
+  aiConversations     AIConversation[]
+  auditLogs           AuditLog[]       @relation("UserAuditLogs")
+  notifications       Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  isRevoked Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DoctorProfile {
+  id                 String       @id @default(uuid())
+  userId             String       @unique
+  bio                String?      @db.Text
+  experienceYears    Int          @default(0)
+  education          String?      @db.Text
+  licenseNumber      String       @unique
+  consultationFee    Decimal      @default(0) @db.Decimal(18, 2)
+  averageRating      Decimal      @default(0) @db.Decimal(3, 2)
+  totalReviews       Int          @default(0)
+  verificationStatus DoctorStatus @default(PENDING)
+  rejectionReason    String?      @db.Text
+  isOnline           Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents          DoctorDocument[]
+  specialties        DoctorSpecialty[]
+  availabilities     Availability[]
+  doctorAppointments Appointment[]       @relation("DoctorAppointments")
+  reviewsReceived    Review[]            @relation("DoctorReviews")
+  ledger             DoctorLedger?
+  applications       DoctorApplication[]
+
+  @@index([verificationStatus])
+}
+
+model DoctorDocument {
+  id              String   @id @default(uuid())
+  doctorProfileId String
+  documentType    String // e.g. DIPLOMA, MEDICAL_LICENSE, PASSPORT
+  fileUrl         String
+  originalName    String
+  uploadedAt      DateTime @default(now())
+
+  doctorProfile DoctorProfile @relation(fields: [doctorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([doctorProfileId])
+}
+
+model DoctorApplication {
+  id              String       @id @default(uuid())
+  doctorProfileId String
+  status          DoctorStatus @default(PENDING)
+  submittedAt     DateTime     @default(now())
+  reviewedAt      DateTime?
+  reviewedBy      String? // Admin User ID
+  notes           String?      @db.Text
+
+  doctorProfile DoctorProfile @relation(fields: [doctorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([doctorProfileId])
+  @@index([status])
+}
+
+model Specialty {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  iconUrl     String?
+  createdAt   DateTime @default(now())
+
+  doctors DoctorSpecialty[]
+}
+
+model DoctorSpecialty {
+  doctorProfileId String
+  specialtyId     String
+
+  doctorProfile DoctorProfile @relation(fields: [doctorProfileId], references: [id], onDelete: Cascade)
+  specialty     Specialty     @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@id([doctorProfileId, specialtyId])
+}
+
+model Availability {
+  id                  String  @id @default(uuid())
+  doctorProfileId     String
+  dayOfWeek           Int // 0=Sunday, 1=Monday, ..., 6=Saturday
+  startTime           String // HH:mm format, e.g. "09:00"
+  endTime             String // HH:mm format, e.g. "17:00"
+  slotDurationMinutes Int     @default(30)
+  isAvailable         Boolean @default(true)
+
+  doctorProfile DoctorProfile @relation(fields: [doctorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([doctorProfileId, dayOfWeek])
+}
+
+model Appointment {
+  id              String                   @id @default(uuid())
+  patientId       String
+  doctorProfileId String
+  startTime       DateTime
+  endTime         DateTime
+  price           Decimal                  @db.Decimal(18, 2)
+  status          AppointmentStatus        @default(PENDING)
+  paymentStatus   AppointmentPaymentStatus @default(UNPAID)
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  patient       User          @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorProfile DoctorProfile @relation("DoctorAppointments", fields: [doctorProfileId], references: [id])
+  consultation  Consultation?
+  payment       Payment?
+  review        Review?
+
+  @@index([patientId])
+  @@index([doctorProfileId])
+  @@index([startTime, endTime])
+  @@index([status])
+}
+
+model Consultation {
+  id            String             @id @default(uuid())
+  appointmentId String             @unique
+  roomName      String             @unique
+  accessCode    String
+  status        ConsultationStatus @default(SCHEDULED)
+  startedAt     DateTime?
+  endedAt       DateTime?
+  createdAt     DateTime           @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  appointmentId     String        @unique
+  providerPaymentId String?       @unique
+  providerName      String        @default("MOCK") // CLICK, PAYME, STRIPE, MOCK
+  grossAmount       Decimal       @db.Decimal(18, 2)
+  platformFee       Decimal       @db.Decimal(18, 2) // 5%
+  doctorAmount      Decimal       @db.Decimal(18, 2) // 95%
+  currency          String        @default("UZS")
+  status            PaymentStatus @default(PENDING)
+  rawWebhookPayload Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  ledgerEntries LedgerEntry[]
+
+  @@index([status])
+}
+
+model Transaction {
+  id             String            @id @default(uuid())
+  paymentId      String
+  transactionRef String            @unique
+  type           TransactionType   @default(CHARGE)
+  amount         Decimal           @db.Decimal(18, 2)
+  currency       String            @default("UZS")
+  status         TransactionStatus @default(SUCCESS)
+  createdAt      DateTime          @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+}
+
+model DoctorLedger {
+  id               String   @id @default(uuid())
+  doctorProfileId  String   @unique
+  totalEarnings    Decimal  @default(0) @db.Decimal(18, 2)
+  availableBalance Decimal  @default(0) @db.Decimal(18, 2)
+  pendingBalance   Decimal  @default(0) @db.Decimal(18, 2)
+  totalWithdrawn   Decimal  @default(0) @db.Decimal(18, 2)
+  updatedAt        DateTime @updatedAt
+
+  doctorProfile DoctorProfile @relation(fields: [doctorProfileId], references: [id], onDelete: Cascade)
+  ledgerEntries LedgerEntry[]
+}
+
+model LedgerEntry {
+  id           String          @id @default(uuid())
+  ledgerId     String
+  paymentId    String?
+  type         LedgerEntryType
+  amount       Decimal         @db.Decimal(18, 2)
+  balanceAfter Decimal         @db.Decimal(18, 2)
+  description  String
+  createdAt    DateTime        @default(now())
+
+  ledger  DoctorLedger @relation(fields: [ledgerId], references: [id], onDelete: Cascade)
+  payment Payment?     @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([ledgerId])
+}
+
+model Review {
+  id              String   @id @default(uuid())
+  appointmentId   String   @unique // Strict rule: 1 appointment = 1 review
+  patientId       String
+  doctorProfileId String
+  rating          Int // 1 to 5
+  comment         String   @db.Text
+  createdAt       DateTime @default(now())
+
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  patient       User          @relation("PatientReviews", fields: [patientId], references: [id])
+  doctorProfile DoctorProfile @relation("DoctorReviews", fields: [doctorProfileId], references: [id])
+
+  @@index([doctorProfileId])
+  @@index([patientId])
+}
+
+model AIConversation {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String   @default("Medical Consultation Assistant")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIMessage[]
+
+  @@index([userId])
+}
+
+model AIMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  sender         AISender
+  content        String   @db.Text
+  createdAt      DateTime @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation("UserAuditLogs", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([action])
+  @@index([actorId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  title     String
+  body      String           @db.Text
+  type      NotificationType @default(SYSTEM)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

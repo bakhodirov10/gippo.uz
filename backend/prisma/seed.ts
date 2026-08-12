@@ -1,7 +1,6 @@
-import { PrismaClient, Role, DoctorStatus } from '@prisma/client';
+import { prisma } from '../lib/prisma';
+import { Role, DoctorStatus } from '@prisma/client';
 import * as argon2 from 'argon2';
-
-const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting Gippo.uz Database Seeding...');
@@ -47,7 +46,7 @@ async function main() {
     type: argon2.argon2id,
   });
 
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'admin@gippo.uz' },
     update: {},
     create: {
@@ -82,7 +81,7 @@ async function main() {
     },
   });
 
-  const doctorProfile = await prisma.doctorProfile.upsert({
+  await prisma.doctorProfile.upsert({
     where: { userId: doctorUser.id },
     update: {},
     create: {
@@ -126,7 +125,7 @@ async function main() {
     type: argon2.argon2id,
   });
 
-  const patient = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'patient@gippo.uz' },
     update: {},
     create: {
