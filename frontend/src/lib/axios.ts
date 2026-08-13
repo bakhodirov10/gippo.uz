@@ -7,13 +7,11 @@ interface ApiErrorResponse {
 type RetryableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 // ─── Single source of truth for the API base URL ──────────────────────────────
-// Set NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1 in .env.local
-// Frontend:  http://localhost:3001  (Next.js)
-// Backend:   http://localhost:3000  (NestJS)
-// API prefix: /api/v1
+// Production API: https://gippo-back.onrender.com/api/v1
+// Swagger docs:   https://gippo-back.onrender.com/api/v1/docs (docs only)
 // ──────────────────────────────────────────────────────────────────────────────
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+  process.env.NEXT_PUBLIC_API_URL || 'https://gippo-back.onrender.com/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
