@@ -1,9 +1,0 @@
-{
-  "title": "Personal Profile",
-  "subtitle": "Manage and update your account credentials",
-  "emailLabel": "Email address",
-  "phoneLabel": "Phone number",
-  "notLinked": "Not linked",
-  "successMsg": "Profile details updated successfully!",
-  "saveBtn": "Save Changes"
-}
