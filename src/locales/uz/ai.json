@@ -1,0 +1,23 @@
+{
+  "title": "AI Medical Assistant",
+  "subtitle": "Xavfsiz, mas'uliyatli va tibbiy disclaimeli AI maslahatchisi",
+  "freeBadge": "100% BEPUL",
+  "clearChat": "Suhbatni Tozalash",
+  "placeholder": "Tibbiy alomatlar yoki savolingizni yozing...",
+  "send": "Yuborish",
+  "disclaimer": "Gippo AI tibbiy tashxis qo'ymaydi va professional shifokor maslahatining o'rnini bosmaydi.",
+  "emergencyAlert": "ZUDLIK BILAN TEZ YORDAM (103) GA QO'NG'IROQ QILING!",
+  "welcomeMessage": "Assalomu alaykum! Men Gippo.uz AI Tibbiy Assistentiman. Qanday tibbiy alomatlar yoki savollaringiz bor? Qulay tarzda yozishingiz mumkin.",
+  "chatCleared": "Suhbat tozalandi. Qanday tibbiy savolingiz bor?",
+  "you": "Siz",
+  "call103": "103 Tez Yordam",
+  "suggested1": "Bosh og'rig'i va charchoq sabablari nimada?",
+  "suggested2": "Shamollashning dastlabki alomatlarida nima qilish kerak?",
+  "suggested3": "Sog'lom ovqatlanish rejasi haqida ma'lumot bering",
+  "suggested4": "Qon bosimi oshganda birinchi yordam",
+  "newChat": "Yangi muloqot",
+  "historyTitle": "Muloqotlar tarixi",
+  "noHistory": "Saqlangan suhbatlar yo'q",
+  "guestBanner": "Tizimga kirish orqali AI suhbatlaringiz tarixini saqlashingiz mumkin.",
+  "loginToSave": "Kirish"
+}

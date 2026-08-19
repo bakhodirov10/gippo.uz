@@ -1,0 +1,12 @@
+{
+  "title": "Payment History",
+  "subtitle": "All completed and pending financial transactions",
+  "transactionsList": "Transactions List",
+  "splitNotice": "Gippo platform takes 5% fee, while 95% is credited to doctor ledger.",
+  "ledgerNotice": "All settlements are backed by secure immutable backend ledger entries.",
+  "noTransactions": "No Transactions Found",
+  "noTransactionsDesc": "You do not have any payment transactions yet.",
+  "transactionId": "Transaction ID",
+  "provider": "Payment Provider",
+  "amount": "Amount"
+}

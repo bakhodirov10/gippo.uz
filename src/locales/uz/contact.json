@@ -1,0 +1,20 @@
+{
+  "title": "Bog'lanish",
+  "subtitle": "Savol yoki takliflaringiz bo'lsa, biz bilan bog'laning. Jamoamiz 24/7 yordam berishga tayyor.",
+  "addressLabel": "Manzil",
+  "addressValue": "Toshkent shahri, Yunusobod tumani, Amir Temur shoh ko'chasi 108",
+  "address": "Toshkent shahri, Yunusobod tumani, Amir Temur shoh ko'chasi 108",
+  "phoneLabel": "Telefon",
+  "messageLabel": "Xabar matni",
+  "messagePlaceholder": "Savol yoki taklifingizni bu yerga yozing...",
+  "sendBtn": "Xabarni yuborish",
+  "thankYou": "Rahmat!",
+  "sentSuccess": "Xabaringiz muvaffaqiyatli yuborildi. Tezsada siz bilan bog'lanamiz.",
+  "infoTitle": "Kontakt Ma'lumotlari",
+  "sentTitle": "Xabar Yuborildi!",
+  "sentDesc": "Xabaringiz qabul qilindi. Tez orada javob beramiz.",
+  "nameLabel": "Ism",
+  "namePlaceholder": "Ismingizni kiriting",
+  "emailLabel": "Email",
+  "emailPlaceholder": "email@example.com"
+}
