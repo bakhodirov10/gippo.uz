@@ -1,0 +1,77 @@
+name: Gippo CI (Continuous Integration)
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run Type Check (TypeScript)
+        run: npx tsc --noEmit
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+  build:
+    name: Build & Verification
+    runs-on: ubuntu-latest
+    needs: [validate]
+    env:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/gippo_ci"
+      JWT_SECRET: "ci-secret-jwt-key"
+      JWT_REFRESH_SECRET: "ci-secret-refresh-key"
+      ADMIN_REGISTRATION_SECRET: "ci-admin-secret"
+      PAYMENT_SECRET: "ci-payment-secret"
+      PAYMENT_WEBHOOK_SECRET: "ci-webhook-secret"
+      GEMINI_API_KEY: "mock_key_for_ci"
+      AI_API_KEY: "mock_key_for_ci"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js Application
+        run: npm run build
+
+      - name: Verify Build Artifacts
+        run: |
+          test -d .next || exit 1
+          echo "Next.js build succeeded and artifacts verified!"

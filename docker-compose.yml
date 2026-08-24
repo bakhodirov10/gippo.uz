@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: gippo_postgres
     restart: always
     environment:
@@ -19,11 +19,11 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+  app:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: gippo_backend
+    container_name: gippo_app
     restart: always
     ports:
       - "3000:3000"
@@ -39,25 +39,14 @@ services:
       ADMIN_REGISTRATION_SECRET: "gippo-admin-secure-registration-code-2026"
       PAYMENT_SECRET: "gippo-payment-secret-key"
       PAYMENT_WEBHOOK_SECRET: "gippo-webhook-signature-secret"
-      AI_API_KEY: "AIzaSy_mock_gemini_api_key_for_backend_env"
+      AI_PROVIDER: "GEMINI"
+      AI_MODEL: "gemini-3.6-flash"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      AI_API_KEY: "${GEMINI_API_KEY}"
       VIDEO_API_SECRET: "gippo-video-telehealth-secret"
     depends_on:
       postgres:
         condition: service_healthy
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: gippo_frontend
-    restart: always
-    ports:
-      - "3001:3000"
-    environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_API_URL: "http://backend:3000"
-    depends_on:
-      - backend
 
 volumes:
   postgres_data:
