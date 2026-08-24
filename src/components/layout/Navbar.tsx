@@ -315,7 +315,7 @@ export function Navbar() {
               {/* Navigation Links */}
               <nav className="space-y-1.5">
                 <p className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-2.5">
-                  Bo'limlar
+                  Bo&apos;limlar
                 </p>
                 
                 <Link

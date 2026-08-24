@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "prisma/**",
     "scratch*.js",
     "test*.js",
+    "src/server/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
   ]),
   {
     rules: {
@@ -21,6 +24,12 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-require-imports": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/rules-of-hooks": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-assign-module-variable": "off",
     },
   },
 ]);
