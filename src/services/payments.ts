@@ -4,7 +4,7 @@ import { appointmentsService } from './appointments';
 
 export interface CreatePaymentPayload {
   appointmentId: string;
-  providerName?: 'CLICK' | 'PAYME' | 'STRIPE' | 'MOCK';
+  providerName?: 'CLICK' | 'PAYME' | 'MOCK';
 }
 
 export const paymentsService = {

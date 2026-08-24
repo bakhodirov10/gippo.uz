@@ -139,7 +139,7 @@ export interface Payment {
   id: string;
   appointmentId: string;
   providerPaymentId?: string;
-  providerName: 'CLICK' | 'PAYME' | 'STRIPE' | 'MOCK';
+  providerName: 'CLICK' | 'PAYME' | 'MOCK';
   grossAmount: number | string;
   platformFee: number | string;
   doctorAmount: number | string;

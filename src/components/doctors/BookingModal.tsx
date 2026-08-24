@@ -34,7 +34,7 @@ export function BookingModal({ doctor, isOpen, onClose }: BookingModalProps) {
     new Date(Date.now() + 86400000).toISOString().split('T')[0]
   );
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('10:00');
-  const [paymentProvider, setPaymentProvider] = useState<'CLICK' | 'PAYME' | 'STRIPE' | 'MOCK'>('MOCK');
+  const [paymentProvider, setPaymentProvider] = useState<'CLICK' | 'PAYME' | 'MOCK'>('CLICK');
   const [step, setStep] = useState<'SELECT' | 'CONFIRM' | 'PAYMENT' | 'SUCCESS'>('SELECT');
 
   const [isLoading, setIsLoading] = useState(false);
@@ -251,7 +251,6 @@ export function BookingModal({ doctor, isOpen, onClose }: BookingModalProps) {
                 {[
                   { id: 'CLICK', name: 'Click Pass', color: 'border-cyan-300 dark:border-cyan-800 bg-cyan-50/50 dark:bg-cyan-950/40' },
                   { id: 'PAYME', name: 'Payme', color: 'border-teal-300 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/40' },
-                  { id: 'STRIPE', name: 'Visa / MasterCard', color: 'border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/40' },
                   { id: 'MOCK', name: 'Test Sandbox (Instant)', color: 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40' },
                 ].map((p) => (
                   <button

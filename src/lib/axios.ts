@@ -7,8 +7,8 @@ interface ApiErrorResponse {
 type RetryableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 // ─── Single source of truth for the API base URL ──────────────────────────────
-// Production API: https://gippoback-swagger.up.railway.app/api/v1
-// Swagger docs:   https://gippoback-swagger.up.railway.app/api/v1/docs
+// Production API: https://gippo-back.onrender.com/api/v1
+// Swagger docs:   https://gippo-back.onrender.com/api/v1/docs
 // ──────────────────────────────────────────────────────────────────────────────
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || '/api/v1';
