@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useLanguageStore } from '@/stores/useLanguageStore';
-import { Stethoscope, ShieldCheck, HeartPulse, Award, Users, Bot } from 'lucide-react';
+import { Stethoscope, ShieldCheck, HeartPulse, Bot } from 'lucide-react';
 
 export default function AboutPage() {
   const { t } = useLanguageStore();
