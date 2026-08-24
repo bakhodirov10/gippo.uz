@@ -18,13 +18,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Generate Prisma Client
         run: npx prisma generate --schema=./prisma/schema.prisma
@@ -39,33 +39,32 @@ jobs:
     name: Build & Verification
     runs-on: ubuntu-latest
     needs: [validate]
-    env:
-      NODE_ENV: production
-      NEXT_TELEMETRY_DISABLED: 1
-      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/gippo_ci?schema=public"
-      JWT_SECRET: "ci-dummy-jwt-secret-key-2026"
-      JWT_REFRESH_SECRET: "ci-dummy-jwt-refresh-secret-key-2026"
-      ADMIN_REGISTRATION_SECRET: "ci-dummy-admin-code-2026"
-      PAYMENT_SECRET: "ci-dummy-payment-secret"
-      PAYMENT_WEBHOOK_SECRET: "ci-dummy-webhook-secret"
-      GEMINI_API_KEY: "dummy_ci_gemini_key_for_build"
-      AI_API_KEY: "dummy_ci_gemini_key_for_build"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Generate Prisma Client
         run: npx prisma generate --schema=./prisma/schema.prisma
 
       - name: Build Next.js Application
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/gippo_ci?schema=public"
+          JWT_SECRET: "ci-dummy-jwt-secret-key-2026"
+          JWT_REFRESH_SECRET: "ci-dummy-jwt-refresh-secret-key-2026"
+          ADMIN_REGISTRATION_SECRET: "ci-dummy-admin-code-2026"
+          PAYMENT_SECRET: "ci-dummy-payment-secret"
+          PAYMENT_WEBHOOK_SECRET: "ci-dummy-webhook-secret"
+          GEMINI_API_KEY: "dummy_ci_gemini_key_for_build"
+          AI_API_KEY: "dummy_ci_gemini_key_for_build"
         run: npm run build
 
       - name: Verify Build Artifacts
