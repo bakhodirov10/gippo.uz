@@ -10,9 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: false
-
 jobs:
   validate:
     name: Lint & Type Check
@@ -24,14 +21,13 @@ jobs:
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: 22
 
       - name: Install Dependencies
-        run: npm ci --include=optional
+        run: npm ci || npm install
 
       - name: Generate Prisma Client
-        run: npx prisma generate
+        run: npx prisma generate --schema=./prisma/schema.prisma
 
       - name: Run ESLint
         run: npm run lint
@@ -46,14 +42,14 @@ jobs:
     env:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: 1
-      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/gippo_ci"
-      JWT_SECRET: "ci-secret-jwt-key"
-      JWT_REFRESH_SECRET: "ci-secret-refresh-key"
-      ADMIN_REGISTRATION_SECRET: "ci-admin-secret"
-      PAYMENT_SECRET: "ci-payment-secret"
-      PAYMENT_WEBHOOK_SECRET: "ci-webhook-secret"
-      GEMINI_API_KEY: "mock_key_for_ci"
-      AI_API_KEY: "mock_key_for_ci"
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/gippo_ci?schema=public"
+      JWT_SECRET: "ci-dummy-jwt-secret-key-2026"
+      JWT_REFRESH_SECRET: "ci-dummy-jwt-refresh-secret-key-2026"
+      ADMIN_REGISTRATION_SECRET: "ci-dummy-admin-code-2026"
+      PAYMENT_SECRET: "ci-dummy-payment-secret"
+      PAYMENT_WEBHOOK_SECRET: "ci-dummy-webhook-secret"
+      GEMINI_API_KEY: "dummy_ci_gemini_key_for_build"
+      AI_API_KEY: "dummy_ci_gemini_key_for_build"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -61,14 +57,13 @@ jobs:
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: 22
 
       - name: Install Dependencies
-        run: npm ci --include=optional
+        run: npm ci || npm install
 
       - name: Generate Prisma Client
-        run: npx prisma generate
+        run: npx prisma generate --schema=./prisma/schema.prisma
 
       - name: Build Next.js Application
         run: npm run build
