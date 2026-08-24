@@ -20,6 +20,10 @@ import { PaymentsService } from './nest/modules/payments/payments.service';
 import { ReviewsService } from './nest/modules/reviews/reviews.service';
 import { SpecialtiesService } from './nest/modules/specialties/specialties.service';
 
+import { EmailService } from './services/email.service';
+import { OtpService } from './services/otp.service';
+import { ContactService } from './services/contact.service';
+
 export type ServerContainer = ReturnType<typeof createContainer>;
 
 function createContainer() {
@@ -30,6 +34,10 @@ function createContainer() {
   const jwt = new JwtService();
   const ai = new AiService(prisma, config);
   ai.onModuleInit();
+
+  const email = new EmailService();
+  const otp = new OtpService(prisma, email, auditLogs);
+  const contact = new ContactService(prisma, email, auditLogs);
 
   return {
     prisma,
@@ -46,6 +54,9 @@ function createContainer() {
     admin: new AdminService(prisma),
     auditLogs,
     ai,
+    email,
+    otp,
+    contact,
   };
 }
 

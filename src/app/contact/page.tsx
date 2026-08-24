@@ -2,15 +2,37 @@
 
 import React, { useState } from 'react';
 import { useLanguageStore } from '@/stores/useLanguageStore';
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import { contactService } from '@/services/contact';
+import { Mail, Phone, MapPin, Send, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const { t } = useLanguageStore();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await contactService.submitMessage(formData);
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || 'Xabarni yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,46 +79,112 @@ export default function ContactPage() {
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t.contact.thankYou}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">{t.contact.sentSuccess}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSubmitted(false);
+                  setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+                }}
+                className="mt-4 px-4 py-2 rounded-xl text-xs font-bold text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/40 border border-teal-200 dark:border-teal-800"
+              >
+                Yana xabar yuborish
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              {error && (
+                <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.firstName}</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                    {t.auth.firstName} *
+                  </label>
                   <input
                     type="text"
                     required
                     placeholder="Ismingiz"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.auth.email}</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                    {t.auth.email} *
+                  </label>
                   <input
                     type="email"
                     required
                     placeholder="email@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                    Telefon raqam
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="+998 90 123 45 67"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                    Mavzu
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Murojaat mavzusi"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">{t.contact.messageLabel}</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                  {t.contact.messageLabel} *
+                </label>
                 <textarea
                   rows={4}
                   required
                   placeholder={t.contact.messagePlaceholder}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
+                disabled={isLoading}
                 className="px-6 py-3 rounded-xl font-bold text-white gradient-teal shadow-lg shadow-teal-500/25 hover:opacity-95 text-xs flex items-center gap-2"
               >
-                <span>{t.contact.sendBtn}</span>
-                <Send className="w-4 h-4" />
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Yuborilmoqda...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{t.contact.sendBtn}</span>
+                    <Send className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
           )}

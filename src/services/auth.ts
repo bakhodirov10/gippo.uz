@@ -121,13 +121,24 @@ export const authService = {
     await apiClient.post('/auth/logout', { refreshToken });
   },
 
-  async forgotPassword(email: string): Promise<{ message: string }> {
-    // Graceful fallback for non-existent reset route
-    return { message: 'Agar ushbu email ro\'yxatdan o\'tgan bo\'lsa, parolni tiklash havolasi yuborildi.' };
+  async sendOtp(email: string, type: 'PASSWORD_RESET' | 'VERIFY_EMAIL' | 'LOGIN_2FA' = 'PASSWORD_RESET'): Promise<{ message: string; expiresInSeconds: number }> {
+    const res = await apiClient.post<any, { message: string; expiresInSeconds: number }>('/auth/otp/send', { email, type });
+    return res;
   },
 
-  async resetPassword(payload: { token: string; newPassword: string }): Promise<{ message: string }> {
-    return { message: 'Parol muvaffaqiyatli yangilandi.' };
+  async verifyOtp(email: string, code: string, type: 'PASSWORD_RESET' | 'VERIFY_EMAIL' | 'LOGIN_2FA' = 'PASSWORD_RESET'): Promise<boolean> {
+    const res = await apiClient.post<any, boolean>('/auth/otp/verify', { email, code, type });
+    return res;
+  },
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const res = await apiClient.post<any, { message: string }>('/auth/forgot-password', { email });
+    return res;
+  },
+
+  async resetPassword(payload: { email: string; code: string; newPassword: string }): Promise<{ message: string }> {
+    const res = await apiClient.post<any, { message: string }>('/auth/reset-password', payload);
+    return res;
   },
 
   async updateProfile(payload: { firstName: string; lastName: string; phone?: string }): Promise<User> {

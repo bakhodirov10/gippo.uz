@@ -83,6 +83,11 @@ async function handle(request: NextRequest, context: Context) {
       case 'POST auth/login': result = await server.auth.login(payload); break;
       case 'POST auth/refresh': result = await server.auth.refreshToken(payload); break;
       case 'POST auth/logout': requireRole(user, role.authenticated); result = await server.auth.logout(user!.id, payload.refreshToken); break;
+      case 'POST auth/otp/send': result = await server.otp.sendOtp(payload.email as string, payload.type as any); break;
+      case 'POST auth/otp/verify': result = await server.otp.verifyOtp(payload.email as string, payload.code as string, payload.type as any); break;
+      case 'POST auth/forgot-password': result = await server.otp.forgotPassword(payload.email as string); break;
+      case 'POST auth/reset-password': result = await server.otp.resetPassword(payload as any); break;
+      case 'POST contact': result = await server.contact.submitMessage(payload as any); status = 201; break;
 
       case 'POST doctors/register': result = await server.doctors.registerDoctor(payload); status = 201; break;
       case 'GET doctors': result = await server.doctors.findPublicDoctors(query.get('specialtyId') ?? undefined, query.get('search') ?? undefined); break;

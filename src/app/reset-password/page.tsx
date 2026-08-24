@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
 import { useLanguageStore } from '@/stores/useLanguageStore';
-import { Lock, AlertCircle, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
+import { Lock, Mail, ShieldCheck, AlertCircle, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   return (
@@ -18,25 +18,43 @@ export default function ResetPasswordPage() {
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get('token') || '';
+  const initialEmail = searchParams.get('email') || '';
+  const initialCode = searchParams.get('code') || searchParams.get('token') || '';
   const { t } = useLanguageStore();
 
+  const [email, setEmail] = useState(initialEmail);
+  const [code, setCode] = useState(initialCode);
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setError('Parollar bir-biriga mos kelmadi');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError('Parol kamida 8 ta belgidan iborat bo\'lishi kerak');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setSuccessMsg(null);
+
     try {
-      await authService.resetPassword({ token, newPassword });
-      setSuccessMsg(t.auth.resetSuccessMsg);
+      const res = await authService.resetPassword({
+        email,
+        code,
+        newPassword,
+      });
+      setSuccessMsg(res.message || t.auth.resetSuccessMsg);
       setTimeout(() => router.push('/login'), 2000);
     } catch (err: any) {
-      setError(err.message || 'Error resetting password');
+      setError(err.message || 'Parolni yangilashda xatolik yuz berdi');
     } finally {
       setIsLoading(false);
     }
@@ -50,6 +68,9 @@ function ResetPasswordContent() {
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t.auth.resetPasswordTitle}</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Emailingizga yuborilgan 6 xonali OTP kod va yangi parolni kiriting
+          </p>
         </div>
 
         {error && (
@@ -68,6 +89,39 @@ function ResetPasswordContent() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">{t.auth.email}</label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <input
+                type="email"
+                required
+                placeholder="user@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+              6 xonali tasdiqlash kodi (OTP)
+            </label>
+            <div className="relative">
+              <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <input
+                type="text"
+                required
+                maxLength={6}
+                placeholder="123456"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none tracking-widest font-mono"
+              />
+            </div>
+          </div>
+
+          <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">{t.auth.newPasswordLabel}</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -75,7 +129,7 @@ function ResetPasswordContent() {
                 type="password"
                 required
                 minLength={8}
-                placeholder="••••••••"
+                placeholder="Kamida 8 ta belgi"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
@@ -83,9 +137,25 @@ function ResetPasswordContent() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Yangi parolni takrorlang</label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <input
+                type="password"
+                required
+                minLength={8}
+                placeholder="Parolni qayta kiriting"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
-            disabled={isLoading || !token}
+            disabled={isLoading || !code || !email}
             className="w-full py-3.5 rounded-xl font-bold text-white gradient-teal shadow-lg shadow-teal-500/25 hover:opacity-95 text-xs flex items-center justify-center gap-2"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : t.auth.resetBtn}
