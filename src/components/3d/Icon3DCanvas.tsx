@@ -10,7 +10,7 @@ interface StepIconProps {
 }
 
 function StepShape({ step }: StepIconProps) {
-  const meshRef = useRef<THREE.Mesh>(null!);
+  const meshRef = useRef<any>(null!);
 
   useFrame((_, delta) => {
     if (meshRef.current) {

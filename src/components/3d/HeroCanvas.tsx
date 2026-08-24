@@ -6,9 +6,9 @@ import { Float, Sphere, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 function MedicalAISphere() {
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const outerWireframeRef = useRef<THREE.Mesh>(null!);
-  const particlesRef = useRef<THREE.Points>(null!);
+  const meshRef = useRef<any>(null!);
+  const outerWireframeRef = useRef<any>(null!);
+  const particlesRef = useRef<any>(null!);
 
   // Generate surrounding particle positions
   const count = 75;

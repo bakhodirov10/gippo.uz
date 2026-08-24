@@ -6,8 +6,8 @@ import { Float, Torus } from '@react-three/drei';
 import * as THREE from 'three';
 
 function NeuralNodes() {
-  const groupRef = useRef<THREE.Group>(null!);
-  const torusRef = useRef<THREE.Mesh>(null!);
+  const groupRef = useRef<any>(null!);
+  const torusRef = useRef<any>(null!);
 
   const { positions, lines } = useMemo(() => {
     const nodeCount = 30;
