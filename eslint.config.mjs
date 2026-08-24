@@ -30,6 +30,7 @@ const eslintConfig = defineConfig([
       "react-hooks/exhaustive-deps": "warn",
       "react/no-unescaped-entities": "off",
       "@next/next/no-assign-module-variable": "off",
+      "@next/next/no-location-assign-relative-destination": "off",
     },
   },
 ]);
