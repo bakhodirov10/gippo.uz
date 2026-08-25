@@ -23,11 +23,9 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
-  experimental: {
-    outputFileTracingIncludes: {
-      '/*': ['./node_modules/.prisma/client/**/*'],
-      '/**/*': ['./node_modules/.prisma/client/**/*'],
-    },
+  outputFileTracingIncludes: {
+    '/*': ['./node_modules/.prisma/client/**/*'],
+    '/**/*': ['./node_modules/.prisma/client/**/*'],
   },
 };
 
