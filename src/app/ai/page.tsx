@@ -265,7 +265,6 @@ export default function AIAssistantPage() {
             </button>
           </div>
         </div>
-      </div>
 
       {/* Guest Notice Banner */}
       {!user && (
