@@ -19,4 +19,13 @@ export class ChatMessageDto {
   @IsOptional()
   @IsString()
   thinkingEffort?: 'low' | 'medium' | 'high';
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  aiModel?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  searchGrounding?: boolean;
 }

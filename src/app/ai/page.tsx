@@ -24,6 +24,8 @@ import {
   X,
   RefreshCw,
   Brain,
+  Globe,
+  Zap,
 } from 'lucide-react';
 import { SkeletonAIMessage } from '@/components/ui/skeletons';
 
@@ -46,6 +48,8 @@ export default function AIAssistantPage() {
   const [emergencyAlert, setEmergencyAlert] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [thinkingEffort, setThinkingEffort] = useState<'low' | 'medium' | 'high'>('medium');
+  const [aiModel, setAiModel] = useState('gemini-2.5-flash');
+  const [searchGrounding, setSearchGrounding] = useState(false);
 
   // Local unpersisted messages (for new chat before first backend save, or guest users)
   const [localMessages, setLocalMessages] = useState<UIFormattedMessage[]>([
@@ -182,6 +186,8 @@ export default function AIAssistantPage() {
       message: text,
       conversationId: activeConversationId,
       thinkingEffort,
+      aiModel,
+      searchGrounding,
     });
   };
 
@@ -235,23 +241,7 @@ export default function AIAssistantPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
-          {/* Thinking Effort Control */}
-          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/50 rounded-xl px-2 py-1.5 border border-slate-200 dark:border-slate-700/50">
-            <Brain className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-            <select
-              value={thinkingEffort}
-              onChange={(e) => setThinkingEffort(e.target.value as any)}
-              className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer appearance-none pr-4"
-              title="Fikrlash chuqurligi (Thinking Budget)"
-            >
-              <option value="low">Tezkor (Low)</option>
-              <option value="medium">Balans (Medium)</option>
-              <option value="high">Chuqur tahlil (High)</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
             {user && (
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -485,6 +475,56 @@ export default function AIAssistantPage() {
             )}
 
             <div ref={chatBottomRef} />
+          </div>
+
+          {/* AI Controls Bar */}
+          <div className="px-4 py-2.5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2 sm:gap-4 shadow-sm z-10">
+            {/* Model Selector */}
+            <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl px-3 py-1.5 border border-slate-200 dark:border-slate-700/50 hover:border-teal-300 dark:hover:border-teal-700 transition-colors">
+              <Zap className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+              <select
+                value={aiModel}
+                onChange={(e) => setAiModel(e.target.value)}
+                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer appearance-none outline-none pr-2"
+              >
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="gemini-2.0-flash-lite-preview-02-05">Gemini Flash-Lite</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                <option value="gemini-2.0-pro-exp-02-05">Gemini 2.0 Pro Exp</option>
+                <option value="gemini-2.0-flash-thinking-exp-01-21">Gemini Thinking</option>
+              </select>
+            </div>
+
+            {/* Google Search Grounding */}
+            <button
+              onClick={() => setSearchGrounding(!searchGrounding)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                searchGrounding
+                  ? 'bg-blue-50 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 shadow-inner'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="Javoblarni Google Qidiruv orqali tekshirish"
+            >
+              <Globe className={`w-3.5 h-3.5 ${searchGrounding ? 'text-blue-600 dark:text-blue-400' : ''}`} />
+              <span>Google Search</span>
+            </button>
+
+            {/* Thinking Effort */}
+            {(aiModel.includes('thinking') || aiModel.includes('pro-exp') || aiModel.includes('reasoning')) && (
+              <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl px-3 py-1.5 border border-purple-200/50 dark:border-purple-700/50 ml-auto sm:ml-0 hover:border-purple-300 transition-colors">
+                <Brain className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                <select
+                  value={thinkingEffort}
+                  onChange={(e) => setThinkingEffort(e.target.value as any)}
+                  className="bg-transparent text-xs font-semibold text-purple-700 dark:text-purple-300 focus:outline-none cursor-pointer appearance-none outline-none pr-2"
+                  title="Fikrlash chuqurligi (Faqat qiyin masalalar uchun)"
+                >
+                  <option value="low">Tez (Low)</option>
+                  <option value="medium">Balans (Medium)</option>
+                  <option value="high">Chuqur (High)</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Suggested Prompts Pill */}

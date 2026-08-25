@@ -5,6 +5,8 @@ export interface ChatMessagePayload {
   conversationId?: string;
   message: string;
   thinkingEffort?: 'low' | 'medium' | 'high';
+  aiModel?: string;
+  searchGrounding?: boolean;
 }
 
 export interface ChatResponse {
@@ -27,6 +29,12 @@ export const aiService = {
     }
     if (payload.thinkingEffort) {
       cleanPayload.thinkingEffort = payload.thinkingEffort;
+    }
+    if (payload.aiModel) {
+      cleanPayload.aiModel = payload.aiModel;
+    }
+    if (payload.searchGrounding !== undefined) {
+      cleanPayload.searchGrounding = payload.searchGrounding;
     }
     return apiClient.post<any, ChatResponse>('/ai/chat', cleanPayload);
   },
