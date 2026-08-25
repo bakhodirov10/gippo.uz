@@ -61,7 +61,7 @@ function failure(error: unknown) {
   }
 
   console.error('API route failed', error);
-  const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : error instanceof Error ? error.message : 'Internal server error';
+  const message = error instanceof Error ? error.message : String(error);
   return NextResponse.json({ success: false, data: null, message, error: 'InternalServerError', code: 500 }, { status: 500 });
 }
 

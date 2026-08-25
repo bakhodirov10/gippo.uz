@@ -10,7 +10,10 @@ export class PrismaService
 {
   constructor() {
     const connectionString = `${process.env.DATABASE_URL}`;
-    const pool = new Pool({ connectionString });
+    const pool = new Pool({ 
+      connectionString,
+      ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false }
+    });
     // pg's type declarations can be duplicated while migrating from the
     // previous standalone backend. Both values are the same runtime Pool.
     const adapter = new PrismaPg(pool as never);
