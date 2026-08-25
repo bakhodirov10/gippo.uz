@@ -55,9 +55,26 @@ function ok(data: unknown, status = 200) {
 function failure(error: unknown) {
   if (error instanceof HttpException) {
     const response = error.getResponse();
-    const detail = typeof response === 'string' ? response : response as { message?: string | string[]; error?: string };
-    const message = typeof detail === 'string' ? detail : Array.isArray(detail.message) ? detail.message.join(', ') : detail.message ?? error.message;
-    return NextResponse.json({ success: false, data: null, message, error: typeof detail === 'string' ? error.name : detail.error ?? error.name, code: error.getStatus() }, { status: error.getStatus() });
+    let message: string | undefined;
+    let errorCode: string | undefined;
+
+    if (typeof response === 'string') {
+      message = response;
+    } else if (response && typeof response === 'object') {
+      const resObj = response as any;
+      if (typeof resObj.error === 'object' && resObj.error?.message) {
+        message = resObj.error.message;
+        errorCode = resObj.error.code;
+      } else if (resObj.message) {
+        message = Array.isArray(resObj.message) ? resObj.message.join(', ') : resObj.message;
+      }
+    }
+
+    message = message || error.message;
+    return NextResponse.json(
+      { success: false, data: null, message, error: errorCode || error.name, code: error.getStatus() },
+      { status: error.getStatus() }
+    );
   }
 
   console.error('API route failed', error);

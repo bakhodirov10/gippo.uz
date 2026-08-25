@@ -46,8 +46,8 @@ interface UIFormattedMessage {
 
 const AVAILABLE_MODELS = [
   {
-    id: 'gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash',
+    id: 'gemini-2.0-flash',
+    name: 'Gemini 2.0 Flash',
     badge: 'Tezkor',
     desc: 'Tezkor tibbiy maslahat va umumiy savollar uchun',
     icon: Zap,
@@ -55,8 +55,8 @@ const AVAILABLE_MODELS = [
     color: 'text-amber-500 dark:text-amber-400',
   },
   {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro',
+    id: 'gemini-1.5-pro',
+    name: 'Gemini 1.5 Pro',
     badge: 'Aqlli',
     desc: 'Murakkab tahlil va aniq tibbiy tavsiyalar',
     icon: Sparkles,
@@ -93,7 +93,7 @@ export default function AIAssistantPage() {
   const [emergencyAlert, setEmergencyAlert] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [thinkingEffort, setThinkingEffort] = useState<'low' | 'medium' | 'high'>('medium');
-  const [aiModel, setAiModel] = useState('gemini-2.5-flash');
+  const [aiModel, setAiModel] = useState('gemini-2.0-flash');
   const [searchGrounding, setSearchGrounding] = useState(false);
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
