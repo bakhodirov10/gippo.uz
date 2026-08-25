@@ -14,4 +14,9 @@ export class ChatMessageDto {
   @IsOptional()
   @IsUUID()
   conversationId?: string;
+
+  @ApiProperty({ required: false, enum: ['low', 'medium', 'high'] })
+  @IsOptional()
+  @IsString()
+  thinkingEffort?: 'low' | 'medium' | 'high';
 }

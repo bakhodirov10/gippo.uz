@@ -4,6 +4,7 @@ import { AIConversation } from '@/types';
 export interface ChatMessagePayload {
   conversationId?: string;
   message: string;
+  thinkingEffort?: 'low' | 'medium' | 'high';
 }
 
 export interface ChatResponse {
@@ -23,6 +24,9 @@ export const aiService = {
     const cleanPayload: ChatMessagePayload = { message: payload.message };
     if (payload.conversationId?.trim()) {
       cleanPayload.conversationId = payload.conversationId.trim();
+    }
+    if (payload.thinkingEffort) {
+      cleanPayload.thinkingEffort = payload.thinkingEffort;
     }
     return apiClient.post<any, ChatResponse>('/ai/chat', cleanPayload);
   },

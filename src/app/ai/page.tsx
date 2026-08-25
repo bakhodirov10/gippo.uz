@@ -23,6 +23,7 @@ import {
   Menu,
   X,
   RefreshCw,
+  Brain,
 } from 'lucide-react';
 import { SkeletonAIMessage } from '@/components/ui/skeletons';
 
@@ -44,6 +45,7 @@ export default function AIAssistantPage() {
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>(undefined);
   const [emergencyAlert, setEmergencyAlert] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [thinkingEffort, setThinkingEffort] = useState<'low' | 'medium' | 'high'>('medium');
 
   // Local unpersisted messages (for new chat before first backend save, or guest users)
   const [localMessages, setLocalMessages] = useState<UIFormattedMessage[]>([
@@ -179,6 +181,7 @@ export default function AIAssistantPage() {
     chatMutation.mutate({
       message: text,
       conversationId: activeConversationId,
+      thinkingEffort,
     });
   };
 
@@ -232,28 +235,45 @@ export default function AIAssistantPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-          {user && (
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="md:hidden px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-colors flex items-center gap-1.5"
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+          {/* Thinking Effort Control */}
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/50 rounded-xl px-2 py-1.5 border border-slate-200 dark:border-slate-700/50">
+            <Brain className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+            <select
+              value={thinkingEffort}
+              onChange={(e) => setThinkingEffort(e.target.value as any)}
+              className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer appearance-none pr-4"
+              title="Fikrlash chuqurligi (Thinking Budget)"
             >
-              {isSidebarOpen ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <Menu className="w-4 h-4" />
-              )}
-              <span>{t.ai.historyTitle || 'Suhbatlar'}</span>
-            </button>
-          )}
+              <option value="low">Tezkor (Low)</option>
+              <option value="medium">Balans (Medium)</option>
+              <option value="high">Chuqur tahlil (High)</option>
+            </select>
+          </div>
 
-          <button
-            onClick={handleStartNewChat}
-            className="px-4 py-2 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900 text-xs font-bold transition-all flex items-center gap-1.5"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>{t.ai.newChat || 'Yangi muloqot'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {user && (
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="md:hidden px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-colors flex items-center gap-1.5"
+              >
+                {isSidebarOpen ? (
+                  <X className="w-4 h-4" />
+                ) : (
+                  <Menu className="w-4 h-4" />
+                )}
+                <span>{t.ai.historyTitle || 'Suhbatlar'}</span>
+              </button>
+            )}
+
+            <button
+              onClick={handleStartNewChat}
+              className="px-4 py-2 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900 text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>{t.ai.newChat || 'Yangi muloqot'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
