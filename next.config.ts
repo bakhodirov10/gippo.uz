@@ -16,7 +16,6 @@ if (!fs.existsSync(prismaClientPath)) {
 }
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -24,6 +23,12 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
+  experimental: {
+    outputFileTracingIncludes: {
+      '/*': ['./node_modules/.prisma/client/**/*'],
+      '/**/*': ['./node_modules/.prisma/client/**/*'],
+    },
+  },
 };
 
 export default nextConfig;
