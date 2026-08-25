@@ -16,6 +16,8 @@ if (!fs.existsSync(prismaClientPath)) {
 }
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker builds, but disable it on Vercel
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
   typescript: {
     ignoreBuildErrors: true,
   },
